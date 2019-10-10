@@ -1,11 +1,13 @@
 class Player
 
-  attr_accessor :hand
+  attr_reader :name, :points
+  attr_accessor :bank, :hand
 
   def initialize (name)
     @name = name
     @hand = []
     @points = 0
+    @bank = 100
   end
 
   def take_card(deck)
@@ -14,6 +16,7 @@ class Player
 
   def count_points
     aces = 0
+    @points = 0
     @hand.each do |card| 
       @points += card.value
       aces += 1 if card.value == 11
@@ -26,10 +29,17 @@ class Player
     @points > 21
   end
 
+  def blackjack?
+    @points == 21
+  end
+
+  def win? (player)
+    !busted? && (@points > player.points || player.busted?)
+  end
+
   def show_hand
     hand = ""
     @hand.each {|card| hand += "#{card.name} "}
     hand
   end
-
 end
