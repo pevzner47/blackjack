@@ -1,9 +1,14 @@
 require_relative 'card'
+require_relative 'validation'
 class CardDeck
+  include Validation
+
   attr_reader :deck
+  validate :deck, :arr_type, Card
 
   def initialize
     @deck = create_deck
+    validate!
   end 
 
   def reshuffle

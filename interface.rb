@@ -13,7 +13,17 @@ class Interface
     puts "Сейчас у вас и у дилера банке #{@game.player.bank}$"
   end
 
-  def round
+  def start
+    loop do
+      round
+      break if !want_play_more?
+    end
+    puts "Игра окончена! Ваш банк #{@game.player.bank}$"
+  end
+
+  private
+
+  def start_round 
     puts 'Делаем ставки...'
     @game.bets
     puts "-#{@game.bet_amount}$"
@@ -30,71 +40,78 @@ class Interface
     puts 'Ваша рука'
     puts @game.player.show_hand
     puts ''
-    player_turn
-    puts 'У вас перебор!' if @game.player.busted?
-    dealer_turn
-    puts "ВЫиграл ли я - #{@game.player.win? (@game.dealer)}"
-    puts ''
-    puts "Количество очков = #{@game.player.count_points}"
-    puts ''
-    if @game.player.win? (@game.dealer) then
+  end
+
+  def the_winner_is
+    case @game.who_win?
+    when 'player'
       puts 'Вы выиграли' 
       @game.player_win
-    else 
+    when 'dealer'
       puts 'Дилер выиграл'
       @game.dealer_win
+    when 'draw'
+      puts 'Ничья'
+      @game.draw
     end
     @game.return_cards
+    puts ''
+  end
+
+  def round
+    start_round
+    player_turn
+    dealer_turn
+    the_winner_is
   end
 
   def player_turn
     @game.player.count_points
-    puts "1: Еще;  2: Себе"
-    key = gets.to_i
-    case key
-    when 1 
-      @game.player.take_card (@game.deck)
-      puts @game.player.show_hand
-      @game.player.count_points
-      player_turn if !@game.player.busted?
-    when 2 
-      return
+    loop do
+      puts "1: Еще;  2: Себе"
+      key = gets.to_i
+      case key
+      when 1 
+        @game.player.take_card (@game.deck)
+        puts @game.player.show_hand
+        @game.player.count_points
+        player_turn if !@game.player.busted?
+        break
+      when 2 
+        break
+      else 
+        puts 'Ошибка ввода!'
+        next
+      end
     end
+    puts "У вас #{@game.player.points}"
+    puts 'Перебор!' if @game.player.busted?
   end
 
   def want_play_more?
     return false if !@game.can_make_bets?
-    puts "Ваш банк #{@game.player.bank}$ ; Банк дилера #{@game.dealer.bank}$"
-    puts 'Играем еще?'
-    puts "1: Да;  2: Нет"
-    key = gets.to_i
-    case key
-    when 1 
-      true
-    when 2
-      false
-    #else next
+    loop do
+      puts "Ваш банк #{@game.player.bank}$ ; Банк дилера #{@game.dealer.bank}$"
+      puts 'Играем еще?'
+      puts "1: Да;  2: Нет"
+      key = gets.to_i
+      case key
+      when 1 
+        return true
+        break
+      when 2
+        return false
+        break
+      else 
+        puts 'Ошибка ввода!'
+        next
+      end
     end
   end
 
   def dealer_turn
     puts 'Ход дилера'
     @game.dealer_turn
-  end
-
-  def start
-    loop do
-      round
-      break if !want_play_more?
-    end
-    puts "Игра окончена! Ваш банк #{@game.player.bank}$"
+    puts 'У дилера перебор!' if @game.dealer.busted?
   end
 end
-
-#алгоритм работает с косяками
-# не обновляется рука
-# поправить область видимости 
-# порабатать с исключениями
-# добавить в интерфейс еще методов для красоты
-# добавить запись перебор у дилера
-# сделать ничью

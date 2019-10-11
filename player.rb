@@ -1,13 +1,18 @@
+require_relative 'validation'
 class Player
+  include Validation
 
   attr_reader :name, :points
   attr_accessor :bank, :hand
+
+  validate :name, :presence
 
   def initialize (name)
     @name = name
     @hand = []
     @points = 0
     @bank = 100
+    validate!
   end
 
   def take_card(deck)

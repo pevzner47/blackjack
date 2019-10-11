@@ -18,7 +18,7 @@ class Game
   end
 
   def can_make_bets?
-    @player.bank != 0 || @dealer.bank != 0
+    @player.bank != 0 && @dealer.bank != 0
   end
 
   def reshuffle
@@ -60,12 +60,23 @@ class Game
     end
   end
 
+  def who_win?
+    return 'player' if @player.win? (@dealer)
+    return 'dealer' if @dealer.win? (@player)
+    return 'draw' if @player.points == @dealer.points
+  end
+
   def dealer_win
     @dealer.bank  += @bet_amount * 2
   end
 
   def player_win
     @player.bank  += @bet_amount * 2
+  end
+
+  def draw
+    @dealer.bank  += @bet_amount
+    @player.bank  += @bet_amount
   end
 
   def return_cards
