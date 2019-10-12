@@ -6,6 +6,7 @@ class Bank
     @player = player_bank
     @dealer = dealer_bank
     @bet = bet
+    validate!
   end
 
   def can_make_bets?
@@ -30,5 +31,11 @@ class Bank
   def draw
     @dealer  += @bet
     @player  += @bet
+  end
+
+  private
+
+  def validate!
+    raise 'Банк игроков не может быть меньше ставки' if @player < @bet || @dealer < @bet
   end
 end
