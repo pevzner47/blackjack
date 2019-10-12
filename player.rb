@@ -3,8 +3,7 @@ require_relative 'hand'
 class Player
   include Validation
 
-  attr_reader :name
-  attr_accessor :bank, :hand
+  attr_reader :name, :hand 
 
   validate :name, :presence
 

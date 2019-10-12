@@ -1,21 +1,20 @@
 class Hand
 
-  attr_reader :cards, :points
+  attr_reader :cards
 
   def initialize
     @cards=[]
-    @points = 0
   end
   
-  def count_points
+  def points
     aces = 0
-    @points = 0
+    points = 0
     @cards.each do |card| 
-      @points += card.value
+      points += card.value
       aces += 1 if card.value == 11
     end
-    aces.times {@points -= 10 if @points > 21}
-    @points
+    aces.times {points -= 10 if points > 21}
+    points
   end
 
   def show

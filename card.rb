@@ -4,8 +4,21 @@ class Card
 
   SUITS = ['+', '<3', '^', '<>']
   RANKS = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
-  CARDS = ['2+', '3+', '4+', '5+', '6+', '7+', '8+', '9+', '10+', 'J+', 'Q+', 'K+', 'A+', '2<3', '3<3', '4<3', '5<3', '6<3', '7<3', '8<3', '9<3', '10<3', 'J<3', 'Q<3', 'K<3', 'A<3','2^', '3^', '4^', '5^', '6^', '7^', '8^', '9^', '10^', 'J^', 'Q^', 'K^', 'A^', '2<>', '3<>', '4<>', '5<>', '6<>', '7<>', '8<>', '9<>', '10<>', 'J<>', 'Q<>', 'K<>', 'A<>']  
+  class << self
 
+    def deck
+      deck = []
+      Card::SUITS.each do |suit|
+        Card::RANKS.each do |rank|
+          name = rank + suit
+          deck << name
+        end
+      end
+      deck
+    end
+  end
+
+  CARDS = self.deck
 
   attr_reader :name, :value
 
@@ -29,6 +42,8 @@ class Card
   private
 
   def validate!
-    raise 'Неверный формат карты!' if !CARDS.include?(@name)
+    raise 'Неверный формат карты!' unless CARDS.include?(@name)
+    raise 'Неправильно указано значение карты!' unless RANKS.include?(@name[0]) || RANKS.include?(@name[0..1])
+    raise 'Неправильно указана масть карты!' unless SUITS.include?(@name[-1]) || SUITS.include?(@name[-2..-1])
   end
 end

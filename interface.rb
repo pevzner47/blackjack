@@ -9,9 +9,10 @@ class Interface
 
   def initialize
     puts 'Введите ваше имя... '
-    @game = Game.new
+    name = gets.chomp
+    @game = Game.new(name)
     puts "Приветствуем вас, #{@game.player.name}!"
-    puts "Сейчас у вас и у дилера банке #{@game.player.bank}$"
+    puts "Сейчас у вас и у дилера банке #{@game.bank.player_bank}$"
   end
 
   def start
@@ -19,7 +20,7 @@ class Interface
       round
       break if !want_play_more?
     end
-    puts "Игра окончена! Ваш банк #{@game.bank.player}$"
+    puts "Игра окончена! Ваш банк #{@game.bank.player_bank}$"
   end
 
   private
@@ -67,7 +68,25 @@ class Interface
   end
 
   def player_turn
-    @game.player_turn
+    loop do
+      puts "1: Еще;  2: Себе"
+      key = gets.to_i
+      case key
+      when 1 
+        @game.player_turn
+        puts @game.player.hand.show
+        break if @game.blackjack?(@game.player) || @game.busted?(@game.player)
+      when 2 
+        break
+      else 
+        puts 'Ошибка ввода!'
+        next
+      end
+    end
+
+
+
+
     puts "У вас #{@game.player.hand.points}"
     puts 'Перебор!' if @game.busted?(@game.player)
   end
@@ -75,7 +94,7 @@ class Interface
   def want_play_more?
     return false if !@game.bank.can_make_bets?
     loop do
-      puts "Ваш банк #{@game.bank.player}$ ; Банк дилера #{@game.bank.dealer}$"
+      puts "Ваш банк #{@game.bank.player_bank}$ ; Банк дилера #{@game.bank.dealer_bank}$"
       puts 'Играем еще?'
       puts "1: Да;  2: Нет"
       key = gets.to_i
@@ -95,7 +114,14 @@ class Interface
 
   def dealer_turn
     puts 'Ход дилера'
-    @game.dealer_turn
+    puts @game.dealer.hand.show
+    puts @game.dealer.hand.points
+    loop do
+      break unless @game.dealer_turn
+      puts @game.dealer.hand.show
+      puts @game.dealer.hand.points
+      next if @game.dealer.should_take_another?
+    end
     puts 'У дилера перебор!' if @game.busted?(@game.dealer)
   end
 end
