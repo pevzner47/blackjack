@@ -2,8 +2,8 @@ require_relative 'validation'
 class Card
   include Validation
 
-  SUITS = ['+', '<3', '^', '<>']
-  RANKS = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
+  SUITS = ['+', '<3', '^', '<>'].freeze
+  RANKS = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'].freeze
   class << self
 
     def deck
@@ -18,7 +18,7 @@ class Card
     end
   end
 
-  CARDS = self.deck
+  CARDS = self.deck.freeze
 
   attr_reader :name, :value
 
