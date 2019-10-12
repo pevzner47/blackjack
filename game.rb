@@ -1,15 +1,16 @@
-require_relative 'card_deck'
+require_relative 'deck'
 require_relative 'player'
+require_relative 'bank'
 
 class Game
 
-  attr_reader :player, :dealer, :bet_amount, :deck
+  attr_reader :player, :dealer, :bet_amount, :deck, :bank
 
   def initialize
     name = gets.chomp
-    @player = Player.new (name)
-    @dealer = Dealer.new ('Дилер')
-    @bet_amount = 10
+    @player = Player.new(name)
+    @dealer = Dealer.new('Дилер')
+    @bank = Bank.new(100, 100, 10)
   end
 
   def bets                            #Начало раунда 
@@ -17,12 +18,8 @@ class Game
     @dealer.bank -= @bet_amount if @dealer.bank >= @bet_amount  #потом здесь исключение или проверку на проигрыш
   end
 
-  def can_make_bets?
-    @player.bank != 0 && @dealer.bank != 0
-  end
-
   def reshuffle
-    @deck = CardDeck.new                      #Взяли новую колоду
+    @deck = Deck.new                      #Взяли новую колоду
     @deck.reshuffle                           #Перемешали
   end
   
@@ -34,53 +31,58 @@ class Game
   end
 
   def player_turn
+    @player.hand.count_points
     loop do
-      break if @player.busted? || @player.blackjack?
+      puts "1: Еще;  2: Себе"
       key = gets.to_i
       case key
-      when 1 #еще
-        @player.take_card
-        @dealer.count_points
-      when 2
+      when 1 
+        @player.take_card(@deck)
+        puts @player.hand.show
+        @player.hand.count_points
+        break if blackjack?(@player) || busted?(@player)
+      when 2 
         break
+      else 
+        puts 'Ошибка ввода!'
+        next
       end
     end
   end
 
   def dealer_turn
-    puts @dealer.show_hand
-    puts @dealer.count_points
-    return if !@dealer.should_take_another? (@player)
+    puts @dealer.hand.show
+    puts @dealer.hand.count_points
+    return if !@dealer.should_take_another? || busted?(@player)
     loop do
       @dealer.take_card(@deck)
-      puts @dealer.show_hand
-      puts @dealer.count_points
-      next if @dealer.should_take_another? (@player)
+      puts @dealer.hand.show
+      puts @dealer.hand.count_points
+      next if @dealer.should_take_another?
       break
     end
   end
 
+  def busted?(player)
+    player.hand.points > 21
+  end
+
+  def blackjack?(player)
+    player.hand.points == 21
+  end
+
+  def win?(player, opponent)
+    !busted?(player) && (player.hand.points > opponent.hand.points || busted?(opponent))
+  end
+
   def who_win?
-    return 'player' if @player.win? (@dealer)
-    return 'dealer' if @dealer.win? (@player)
-    return 'draw' if @player.points == @dealer.points
-  end
-
-  def dealer_win
-    @dealer.bank  += @bet_amount * 2
-  end
-
-  def player_win
-    @player.bank  += @bet_amount * 2
-  end
-
-  def draw
-    @dealer.bank  += @bet_amount
-    @player.bank  += @bet_amount
+    return 'player' if win?(@player, @dealer)
+    return 'dealer' if win?(@dealer, @player)
+    return 'draw' if @player.hand.points == @dealer.hand.points
   end
 
   def return_cards
-    @player.hand = []
-    @dealer.hand = []
+    @player.hand.return_cards
+    @dealer.hand.return_cards
   end
 end
