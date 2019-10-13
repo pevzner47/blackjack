@@ -17,7 +17,7 @@ module Validation
 
     private
     
-    def options_arr= (value)
+    def options_arr=(value)
       @options_arr = value
     end
 

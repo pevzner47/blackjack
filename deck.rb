@@ -1,10 +1,12 @@
 require_relative 'card'
 require_relative 'validation'
-class CardDeck
+class Deck
   include Validation
 
   attr_reader :deck
   validate :deck, :arr_type, Card
+
+  
 
   def initialize
     @deck = create_deck
@@ -23,13 +25,13 @@ class CardDeck
   private
 
   def create_deck
-    @deck = []
-    suits = ['+', '<3', '^', '<>']
-    ranks = [2, 3, 4, 5, 6, 7, 8, 9, 10, 'J', 'Q', 'K', 'A']
-    for i in ranks do
-      suits.each {|suit| name = i.to_s + suit; @deck << Card.new(name)}
+    deck = []
+    Card::SUITS.each do |suit|
+      Card::RANKS.each do |rank|
+        deck << Card.new(rank, suit)
+      end
     end
-    @deck
+    deck
   end
 end
 

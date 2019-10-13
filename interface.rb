@@ -1,117 +1,92 @@
-require_relative 'card_deck'
+require_relative 'deck'
 require_relative 'card'
 require_relative 'player'
 require_relative 'dealer'
 require_relative 'game'
+require_relative 'bank'
 
 class Interface
 
-  def initialize
-    puts 'Введите ваше имя... '
-    @game = Game.new
-    puts "Приветствуем вас, #{@game.player.name}!"
-    puts "Сейчас у вас и у дилера банке #{@game.player.bank}$"
+  attr_reader :game
+
+  def game=(value)
+    @game = value
+  end 
+
+  def get_name
+    puts 'Введите ваше имя... ' 
+    name = gets.chomp
+    name 
   end
 
-  def start
-    loop do
-      round
-      break if !want_play_more?
-    end
-    puts "Игра окончена! Ваш банк #{@game.player.bank}$"
+  def greeting
+    puts "Приветствуем вас, #{@game.player.name}!" 
+    puts "Сейчас у вас и у дилера банке #{@game.bank.player_bank}$"
   end
 
-  private
+  def game_over
+    puts "Игра окончена! Ваш банк #{@game.bank.player_bank}$"
+  end
 
   def start_round 
     puts 'Делаем ставки...'
-    @game.bets
-    puts "-#{@game.bet_amount}$"
+    puts "-#{@game.bank.bet}$"
     puts ''
     puts 'Тасуем колоду...'
-    @game.reshuffle
     puts ''
     puts 'Раздаем карты...'
-    @game.deals_cards
     puts ''
     puts 'Рука дилера'
     puts @game.dealer.show_hiden_hand
     puts ''
     puts 'Ваша рука'
-    puts @game.player.show_hand
+    puts @game.player.hand.show
+    puts @game.player.hand.points
     puts ''
   end
 
-  def the_winner_is
-    case @game.who_win?
-    when 'player'
-      puts 'Вы выиграли' 
-      @game.player_win
-    when 'dealer'
-      puts 'Дилер выиграл'
-      @game.dealer_win
-    when 'draw'
-      puts 'Ничья'
-      @game.draw
-    end
-    @game.return_cards
-    puts ''
+  def more?
+    puts "1: Еще;  2: Себе"
+    gets.to_i
   end
 
-  def round
-    start_round
-    player_turn
-    dealer_turn
-    the_winner_is
+  def show_hand(player)
+    puts player.hand.show
+    puts player.hand.points
   end
 
-  def player_turn
-    @game.player.count_points
-    loop do
-      puts "1: Еще;  2: Себе"
-      key = gets.to_i
-      case key
-      when 1 
-        @game.player.take_card (@game.deck)
-        puts @game.player.show_hand
-        @game.player.count_points
-        player_turn if !@game.player.busted?
-        break
-      when 2 
-        break
-      else 
-        puts 'Ошибка ввода!'
-        next
-      end
-    end
-    puts "У вас #{@game.player.points}"
-    puts 'Перебор!' if @game.player.busted?
+  def busted_message
+    puts 'Перебор!'
+  end
+
+  def dealer_turn_message
+    puts 'Ход дилера'
+  end
+
+  def show_player_points
+    puts "У вас #{@game.player.hand.points}"
+  end
+
+  def input_error_message
+    puts 'Ошибка ввода!'
+  end
+
+  def you_win_message
+    puts 'Вы выиграли!'
+  end
+
+  def dealer_win_message
+    puts 'Дилер выиграл!'
+  end
+
+  def draw_message
+    puts 'Ничья!'
   end
 
   def want_play_more?
-    return false if !@game.can_make_bets?
-    loop do
-      puts "Ваш банк #{@game.player.bank}$ ; Банк дилера #{@game.dealer.bank}$"
-      puts 'Играем еще?'
-      puts "1: Да;  2: Нет"
-      key = gets.to_i
-      case key
-      when 1 
-        return true
-        break
-      when 2
-        return false
-        break
-      else 
-        puts 'Ошибка ввода!'
-        next
-      end
-    end
-  end
-
-  def dealer_turn
-    puts 'Ход дилера'
-    @game.dealer_turn
-    puts 'У дилера перебор!' if @game.dealer.busted?
+    puts "Ваш банк #{@game.bank.player_bank}$ ; Банк дилера #{@game.bank.dealer_bank}$"
+    puts 'Играем еще?'
+    puts "1: Да;  2: Нет"
+    gets.to_i
   end
 end
