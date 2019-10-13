@@ -6,6 +6,8 @@ class Deck
   attr_reader :deck
   validate :deck, :arr_type, Card
 
+  
+
   def initialize
     @deck = create_deck
     validate!
@@ -24,7 +26,11 @@ class Deck
 
   def create_deck
     deck = []
-    Card::CARDS.each {|name| deck << Card.new(name)}
+    Card::SUITS.each do |suit|
+      Card::RANKS.each do |rank|
+        deck << Card.new(rank, suit)
+      end
+    end
     deck
   end
 end

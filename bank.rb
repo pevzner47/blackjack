@@ -5,7 +5,7 @@ class Bank
 
   attr_reader :bet, :player_bank, :dealer_bank
 
-  def initialize(player_bank, dealer_bank, bet)
+  def initialize(player_bank = DEFAULT_BANK, dealer_bank = DEFAULT_BANK, bet = DEFAULT_BET)
     @player_bank = player_bank
     @dealer_bank = dealer_bank
     @bet = bet

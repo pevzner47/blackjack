@@ -5,4 +5,5 @@ require_relative 'dealer'
 require_relative 'interface'
 
 interface = Interface.new
-interface.start
+game = Game.new(interface)
+game.start

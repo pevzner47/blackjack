@@ -1,4 +1,5 @@
 require_relative 'game'
+
 class Dealer < Player
 
   def should_take_another?

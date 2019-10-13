@@ -4,35 +4,25 @@ class Card
 
   SUITS = ['+', '<3', '^', '<>'].freeze
   RANKS = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'].freeze
-  class << self
 
-    def deck
-      deck = []
-      Card::SUITS.each do |suit|
-        Card::RANKS.each do |rank|
-          name = rank + suit
-          deck << name
-        end
-      end
-      deck
-    end
-  end
+  attr_reader :value
 
-  CARDS = self.deck.freeze
-
-  attr_reader :name, :value
-
-  def initialize(name)
-    @name = name
+  def initialize(rank, suit)
+    @suit = suit 
+    @rank = rank
     @value = value_set
     validate!
   end
 
+  def name
+    @rank + @suit
+  end
+
   def value_set
-    case @name[0]
+    case @rank
     when '2'..'9'
-      @value = @name.to_i
-    when '1', 'J', 'Q', 'K'
+      @value = @rank.to_i
+    when '10', 'J', 'Q', 'K'
       @value = 10
     when 'A'
       @value = 11
@@ -42,8 +32,7 @@ class Card
   private
 
   def validate!
-    raise 'Неверный формат карты!' unless CARDS.include?(@name)
-    raise 'Неправильно указано значение карты!' unless RANKS.include?(@name[0]) || RANKS.include?(@name[0..1])
-    raise 'Неправильно указана масть карты!' unless SUITS.include?(@name[-1]) || SUITS.include?(@name[-2..-1])
+    raise 'Неправильно указано значение карты!' unless RANKS.include?(@rank)
+    raise 'Неправильно указана масть карты!' unless SUITS.include?(@suit)
   end
 end
